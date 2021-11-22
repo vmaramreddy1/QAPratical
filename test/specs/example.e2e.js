@@ -26,14 +26,12 @@ describe('Swimlane application', () => {
         await NewEmployeePage.getField('Email').setValue("vijay.in.vnr@gmail.com");
         //browser.moveToObject(NewEmployeePage.getField('Text'));
         await NewEmployeePage.getField('Text').setValue("Sample Text");
-        NewEmployeePage.clickRadioBox('Intern');
-        browser.pause(2000);
-        NewEmployeePage.clickRadioBox('Dental');
-        browser.pause(2000);
-        NewEmployeePage.clickRadioBox('Marketing');        
-        // await NewEmployeePage.getField('Employee ID').setValue("N095267");
-        // await NewEmployeePage.getField('Favourite Band').click();
-        // await NewEmployeePage.getField('Notes').setValue("Hello , this is notes by automation");
+        var radiobox = await NewEmployeePage.getField('Full Time');
+        await radiobox.click();
+        radiobox = await NewEmployeePage.getField('Dental');
+        await radiobox.click();
+        radiobox = await NewEmployeePage.getField('Marketing');
+        await radiobox.click();        
         await browser.saveScreenshot('/Users/vijaym/Desktop/screenshot.png');
         
     });

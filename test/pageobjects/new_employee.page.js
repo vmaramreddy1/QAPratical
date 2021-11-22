@@ -5,18 +5,18 @@ import Page from './page';
  */
 class NewEmployeePage extends Page {
 
-    clickRadioBox(fieldName){
-        browser.execute(function (fieldName) {
-            console.log("fiedld Name is :" + fieldName);
-            var radioBoxElements = this.document.getElementsByClassName("radio field-radio");
-            for(let i=0; i<radioBoxElements.length; i++){
-                var labelEle = radioBoxElements[i].getElementsByTagName('label')[0];
-                labelEle.scrollIntoView();
-                if(labelEle.innerText === fieldName){
-                    radioBoxElements[i].getElementsByTagName('input')[0].click();
-                }
+    async getRadioBox(fieldName){
+        let radioList = await browser.$$("//input[@type='radio']/parent::label");
+        console.log("Radio list size is " + radioList.length);
+        for(let i=0; i<radioList.length; i++){
+            let text = await radioList[i].getText();
+            console.log('Text is :'+ text);
+            if(text===fieldName){
+                console.log("inside if loop");
+                var radioLabel = radioList[i];
+                return await radioLabel.$('./input');
             }
-        },fieldName);    
+        }
     }
 
 
@@ -39,6 +39,23 @@ class NewEmployeePage extends Page {
             case 'Street Address':
                 webElement = $("//span[text()='"+fieldName+"']/ancestor::label/following-sibling::node()"+
                 "/child::node()[contains(@ng-switch,'field.fieldType')]//textarea");
+                break;
+            case 'Full Time':
+            case 'Part Time':
+            case 'Intern':
+            case '401(k)':
+            case 'Medical':
+            case 'Dental':
+            case 'Vision':
+            case 'Engineering':
+            case 'Sales':
+            case 'Accounting':
+            case 'Products':
+            case 'Custodial':
+            case 'HR':
+            case 'Marketing':
+            case 'Other':
+                webElement = this.getRadioBox(fieldName);    
                 break;
             case 'Favourite Band':
                 webElement = $("//*[contains(text(),'Favourite Band')]/ancestor::label/following-sibling::node()//a");
