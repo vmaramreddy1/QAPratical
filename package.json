@@ -15,5 +15,11 @@
     },
     "scripts": {
         "wdio": "wdio run wdio.conf.js"
+    },
+    "mocha": {
+        "spec": "./test/specs/**/*.js"
+    },
+    "dependencies": {
+        "node-rest-client": "^1.4.4"
     }
 }

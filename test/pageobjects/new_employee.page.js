@@ -19,6 +19,13 @@ class NewEmployeePage extends Page {
         }
     }
 
+    async selectDropdown(dropdownValue){
+        let option = await browser.$("//li[@role='option']//div[contains(text(),'"+ dropdownValue +"')]");
+        await option.waitForExist({ timeout: 5000 });
+        await option.click();
+    }
+
+
 
     
     getField(fieldName){
@@ -61,7 +68,19 @@ class NewEmployeePage extends Page {
                 webElement = $("//*[contains(text(),'Favourite Band')]/ancestor::label/following-sibling::node()//a");
                 break;
             case 'Notes':
-                webElement = $("//div[@class='ql-editor']");
+                webElement = $("//div[contains(@class,'ql-editor')]");
+                break;
+            case 'Post Comment':
+                webElement = $("//span[contains(text(),'Post Comment')]");
+                break;
+            case 'Save':
+                webElement = $("//span[@ng-show='tool.icon']//following-sibling::span[text()='Save']");
+                break;
+            case 'Time Spent':
+                webElement = $("//div[@class='modal-dialog']//button");
+                break;
+            case 'Record Saved':
+                webElement = $("//div[@class='ng-notification-content animated']/span[text()='Record saved']");
                 break;
         }
         return webElement;
