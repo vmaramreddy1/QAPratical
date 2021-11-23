@@ -1,9 +1,42 @@
 import LoginPage from  '../pageobjects/login.page';
 import LandingPage from '../pageobjects/landing.page';
 import NewEmployeePage from '../pageobjects/new_employee.page';
+import applicationRecord from '../model/application_record';
 var Client = require('node-rest-client').Client;
+var chai = require('chai');
+let chaiHttp = require('chai-http');  
+var assert = chai.assert;    // Using Assert style
+// var expect = chai.expect;    // Using Expect style
+//var should = chai.should();  // Using Should style
+chai.use(chaiHttp);
 
 describe('Swimlane application', () => {
+    var token;
+    var client = new Client();
+    var cookies;
+    var rest_body;
+    var rest_response;
+    before(function (done) {
+        var email = "vijay.bhasker";
+        var password = "Q^crpXMCD7G5";
+        var args = {
+            data: JSON.stringify({ username: email, password: password }),
+            headers: { "Content-Type": "application/json" }
+        };
+        client.post("https://qa-practical.qa.swimlane.io/api/user/login", args, 
+            function (data, response) {
+                // parsed response body as js object
+                //console.log('Data is '+ JSON.parse(data).token);
+                token = JSON.parse(data).token;
+                assert.isNotNull(token,"Token must be present");
+                //console.log(response.statusCode);
+                if (parseInt(response.statusCode) === 200) {
+                    cookies = response.headers['set-cookie'].pop().split(';')[0];
+                    assert.isNotNull(cookies, 'Cookie must be present');
+                }
+        })
+    });
+
     it('should login with valid credentials', async () => {
         await LoginPage.open();
         await LoginPage.login('vijay.bhasker', 'Q^crpXMCD7G5');
@@ -48,42 +81,76 @@ describe('Swimlane application', () => {
 
 
     it('Swimlane API- fetch application by recordId', async() =>{
-        var client = new Client();
-        var email = "vijay.bhasker";
-        var password = "Q^crpXMCD7G5";
         var args = {
-            data: JSON.stringify({ username: email, password: password }),
-            headers: { "Content-Type": "application/json" }
+                    headers: { "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token, 
+                    "Cookie": cookies},
         };
-        var request = client.post("https://qa-practical.qa.swimlane.io/api/user/login", args, 
-            function (data, response) {
-                // parsed response body as js object
-                //console.log('Data is '+ JSON.parse(data).token);
-                token = JSON.parse(data).token;
-                console.log(token);
-                //console.log(response.statusCode);
-                if (parseInt(response.statusCode) === 200) {
-                   //console.log("Res is"+response.data['token']);
-                }
+        var id=1234;
+        var record_id = 5678;
+        chai.request("https://qa-practical.qa.swimlane.io")
+            .get("/api/app/"+id+"/record/"+ record_id)
+            .set(args)
+            .end((err, res) => {
+                if(err) done(err);
+                rest_response = res;
+                rest_body = res.body;
+                expect(res).to.have.status(200);
+                res.should.have.status(200);
+                res.body.should.be.a('array');
+                res.body.length.should.be.eql(0);
+            done();
+          });
+        // console.log("Rest Response" + this.rest_response);
+        // console.log("Rest Response Body" + rest_body);
+    });
 
-                var args = {
-                    path: { "id": 1234 },
-                    headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token},
-                    strictSSL: false
-                };
-                console.log('Sending the API request');
-                client.get("https://qa-practical.qa.swimlane.io/api/app/${id}/record", args,
-                    function (data, response) {
-                        console.log(response.statusCode);
-                    });
-            });
-        request.on('error', function (err) {
-            console.log('request error', err);
-        });
+    it('Swimlane API- Post recordId', async() =>{
+        var args = {
+                    headers: { "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token, 
+                    "Cookie": cookies},
+        };
+        var id=1234;
+        chai.request("https://qa-practical.qa.swimlane.io")
+            .post("/api/app/"+id+"/record/")
+            .set(args)
+            .send(applicationRecord)
+            .end((err, res) => {
+                if(err) done(err);
+                rest_response = res;
+                rest_body = res.body;
+                expect(res).to.have.status(200);
+                res.should.have.status(200);
+                res.body.should.be.a('array');
+                res.body.length.should.be.eql(0);
+            done();
+          });
+    });
 
-
-
+    it('Swimlane API- Delete recordId', async() =>{
+        var args = {
+                    headers: { "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token, 
+                    "Cookie": cookies},
+        };
+        var id=1234;
+        var record_id = 5678;
+        chai.request("https://qa-practical.qa.swimlane.io")
+            .delete("/api/app/"+id+"/record/"+ record_id)
+            .set(args)
+            .end((err, res) => {
+                if(err) done(err);
+                rest_response = res;
+                rest_body = res.body;
+                expect(res).to.have.status(200);
+                res.should.have.status(200);
+                res.body.should.be.a('array');
+                res.body.length.should.be.eql(0);
+            done();
+          });
     });
 });
+
 
 
