@@ -6,21 +6,18 @@ import Page from './page';
 class NewEmployeePage extends Page {
 
     async getRadioBox(fieldName){
-        let radioList = await browser.$$("//input[@type='radio']/parent::label");
-        console.log("Radio list size is " + radioList.length);
+        const radioList = await browser.$$("//input[@type='radio']/parent::label");
         for(let i=0; i<radioList.length; i++){
             let text = await radioList[i].getText();
-            console.log('Text is :'+ text);
             if(text===fieldName){
-                console.log("inside if loop");
-                var radioLabel = radioList[i];
+                let radioLabel = radioList[i];
                 return await radioLabel.$('./input');
             }
         }
     }
 
     async selectDropdown(dropdownValue){
-        let option = await browser.$("//li[@role='option']//div[contains(text(),'"+ dropdownValue +"')]");
+        const option = await browser.$("//li[@role='option']//div[contains(text(),'"+ dropdownValue +"')]");
         await option.waitForExist({ timeout: 5000 });
         await option.click();
     }
@@ -29,7 +26,7 @@ class NewEmployeePage extends Page {
 
     
     getField(fieldName){
-        var webElement = null;
+        let webElement = null;
         switch(fieldName){
             case 'First Name':
             case 'Last Name':
